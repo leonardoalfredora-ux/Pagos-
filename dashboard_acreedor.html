@@ -189,27 +189,33 @@ function fmtD(d) {
 function api(params) {
   return new Promise((resolve, reject) => {
     const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-
     const url = new URL(SCRIPT_URL);
     Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, String(v)));
     url.searchParams.set('callback', cbName);
 
-    window[cbName] = (data) => {
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
       delete window[cbName];
+      try { document.head.removeChild(script); } catch(e) {}
+      reject(new Error('Timeout'));
+    }, 20000);
+
+    window[cbName] = (data) => {
+      clearTimeout(timer);
+      delete window[cbName];
+      try { document.head.removeChild(script); } catch(e) {}
       if (data && data.error) reject(new Error(data.error));
       else resolve(data);
     };
 
-    fetch(url.toString(), { redirect: 'follow' })
-      .then(r => r.text())
-      .then(text => {
-        try { eval(text); }
-        catch(e) { delete window[cbName]; reject(e); }
-      })
-      .catch(err => {
-        delete window[cbName];
-        reject(err);
-      });
+    script.src = url.toString();
+    script.onerror = () => {
+      clearTimeout(timer);
+      delete window[cbName];
+      try { document.head.removeChild(script); } catch(e) {}
+      reject(new Error('Script error'));
+    };
+    document.head.appendChild(script);
   });
 }
 
