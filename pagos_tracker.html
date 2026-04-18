@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Pagos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:    #F7F4EE;
+  --cream2:   #EDE9E1;
+  --cream3:   #E2DDD4;
+  --white:    #FDFCFA;
+  --ink:      #111110;
+  --ink2:     #3a3935;
+  --ink3:     #7a7771;
+  --ink4:     #b0ada6;
+  --border:   rgba(0,0,0,0.08);
+  --border2:  rgba(0,0,0,0.14);
+  --green:    #2d6a4f;
+  --green-bg: #edf7f2;
+  --red:      #9b2335;
+  --red-bg:   #fdf0f2;
+  --serif:    'Playfair Display', Georgia, serif;
+  --mono:     'Geist Mono', monospace;
+  --sans:     'Geist', system-ui, sans-serif;
+  --radius:   10px;
+  --radius-lg: 16px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Layout ── */
+.page { max-width: 680px; margin: 0 auto; padding: 0 20px 80px; }
+
+/* ── Top bar ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 40px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.brand-dot {
+  width: 8px; height: 8px;
+  background: var(--ink);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.brand-name {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.topbar-actions { display: flex; gap: 8px; }
+
+/* ── Buttons ── */
+.btn-ghost {
+  background: var(--white);
+  border: 1px solid var(--border2);
+  color: var(--ink2);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-ghost:hover { background: var(--cream2); border-color: var(--border2); }
+
+.btn-primary {
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--white);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.15s;
+  width: 100%;
+}
+.btn-primary:hover { opacity: 0.82; }
+.btn-primary:active { transform: scale(0.99); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Heading section ── */
+.hero { margin-bottom: 36px; }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--ink4);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--ink3);
+  margin-top: 6px;
+  font-weight: 300;
+}
+
+/* ── Stats ── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.stat {
+  background: var(--white);
+  padding: 20px 20px 18px;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.stat-value.paid { color: var(--green); }
+.stat-value.owed { color: var(--red); }
+
+/* ── Progress ── */
+.progress-wrap {
+  background: var(--white);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 40px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink4);
+}
+
+.progress-pct {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink2);
+}
+
+.progress-track {
+  height: 3px;
+  background: var(--cream3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--ink);
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Section heading ── */
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink4);
+}
+
+/* ── Form ── */
+.form-wrap {
+  background: var(--white);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-grid .full { grid-column: span 2; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="url"],
+select {
+  background: var(--cream);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+  appearance: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--ink);
+  background: var(--white);
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7771' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+select option { background: #fff; }
+
+.file-zone {
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  background: var(--cream);
+  padding: 12px 14px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+}
+.file-zone:hover { border-color: var(--ink3); background: var(--cream2); }
+
+.file-zone input {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  font-size: 0;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.file-fake {
+  font-size: 12px;
+  color: var(--ink3);
+  pointer-events: none;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider span {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink4);
+  letter-spacing: 0.1em;
+}
+
+/* ── Payment list ── */
+.payment-list { display: flex; flex-direction: column; gap: 1px; }
+
+.payment-list-wrap {
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.payment-item {
+  background: var(--white);
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 0 16px;
+  align-items: center;
+  padding: 16px 20px;
+  transition: background 0.12s;
+}
+
+.payment-item:hover { background: var(--cream); }
+
+.pay-index {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink4);
+  font-weight: 300;
+}
+
+.pay-body {}
+
+.pay-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink4);
+  margin-bottom: 2px;
+}
+
+.pay-concept {
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.pay-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.pay-amount {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.pay-actions { display: flex; gap: 6px; align-items: center; }
+
+.proof-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink2);
+  text-decoration: none;
+  background: var(--cream2);
+  border: 1px solid var(--border2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.proof-btn:hover { background: var(--cream3); }
+
+.del-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink4);
+  font-size: 14px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  line-height: 1;
+  transition: color 0.12s, background 0.12s;
+  font-family: var(--sans);
+}
+.del-btn:hover { color: var(--red); background: var(--red-bg); }
+
+.empty-state {
+  background: var(--white);
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+}
+
+.empty-line1 {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--ink3);
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.empty-line2 {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink4);
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 10px 20px;
+  border-radius: 99px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+  z-index: 200;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Modal ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(17,17,16,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+}
+
+.modal-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--ink4);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: var(--cream2);
+  border: 1px solid var(--border2);
+  color: var(--ink3);
+  font-size: 14px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  transition: background 0.12s;
+}
+.modal-close:hover { background: var(--cream3); color: var(--ink); }
+
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.modal img {
+  width: 100%;
+  border-radius: var(--radius);
+  margin-top: 16px;
+  object-fit: contain;
+  max-height: 55vh;
+  border: 1px solid var(--border2);
+}
+
+/* ── Status indicator ── */
+.api-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink4);
+}
+
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink4);
+  flex-shrink: 0;
+}
+.status-dot.ok { background: var(--green); }
+.status-dot.err { background: var(--red); }
+.status-dot.loading { background: var(--ink4); animation: pulse 1s infinite; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── No script banner ── */
+.api-banner {
+  background: var(--cream2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  display: none;
+}
+
+.api-banner a {
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Setup section ── */
+.setup-card {
+  background: var(--white);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.setup-title {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.setup-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.step-num {
+  width: 22px; height: 22px;
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink3);
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: 12px;
+  color: var(--ink2);
+  padding-top: 2px;
+  line-height: 1.6;
+}
+
+.step-text code {
+  font-family: var(--mono);
+  background: var(--cream2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.url-input-wrap { display: flex; gap: 8px; margin-top: 16px; }
+.url-input-wrap input { flex: 1; }
+.url-input-wrap button { white-space: nowrap; padding: 9px 16px; font-size: 12px; }
+
+/* ── Responsive ── */
+@media (max-width: 520px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .full { grid-column: span 1; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .payment-item { grid-template-columns: 32px 1fr; grid-template-rows: auto auto; gap: 4px 12px; }
+  .pay-right { grid-column: 2; flex-direction: row; align-items: center; justify-content: space-between; }
+}
+
+/* ── Entry animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.3s ease forwards; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <span class="brand-name">Pagos</span>
+    </div>
+    <div class="topbar-actions">
+      <div class="api-status">
+        <div class="status-dot loading" id="status-dot"></div>
+        <span id="status-text">conectando</span>
+      </div>
+      <button class="btn-ghost" onclick="openConfig()">Configurar</button>
+    </div>
+  </div>
+
+  <!-- API banner (shown when no URL set) -->
+  <div class="api-banner" id="api-banner">
+    Aún no has configurado tu Google Sheet. Sigue los pasos de abajo para activar el registro en la nube.
+  </div>
+
+  <!-- Setup card (hidden once URL is set) -->
+  <div class="setup-card" id="setup-card">
+    <div class="setup-title">Conectar con Google Sheets</div>
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-text">Abre <a href="https://sheets.new" target="_blank" style="color:var(--ink);text-decoration:underline;text-underline-offset:2px;">sheets.new</a> y crea una hoja nueva.</div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-text">Ve a <code>Extensiones → Apps Script</code>, borra el código que hay y pega el archivo <code>apps_script.gs</code> que te di.</div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="step-text">Guarda, luego haz clic en <code>Implementar → Nueva implementación</code>. Tipo: <code>Aplicación web</code>. Acceso: <code>Cualquier usuario</code>. Copia la URL.</div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">4</div>
+      <div class="step-text">Pega la URL aquí abajo y haz clic en Conectar.</div>
+    </div>
+    <div class="url-input-wrap">
+      <input type="url" id="setup-url" placeholder="https://script.google.com/macros/s/..." />
+      <button class="btn-ghost" onclick="connectScript()">Conectar</button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero" id="hero" style="display:none;">
+    <p class="eyebrow">Registro de pagos</p>
+    <h1 class="hero-title" id="hero-title">—</h1>
+    <p class="hero-sub" id="hero-sub"></p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats-block" style="display:none;">
+    <div class="stat">
+      <div class="stat-label">Deuda total</div>
+      <div class="stat-value owed" id="stat-total">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total pagado</div>
+      <div class="stat-value paid" id="stat-paid">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pendiente</div>
+      <div class="stat-value" id="stat-pending">—</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="progress-wrap" style="display:none; margin-top:1px;">
+    <div class="progress-header">
+      <span class="progress-title">Progreso</span>
+      <span class="progress-pct" id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div style="height:40px" id="gap-after-stats"></div>
+
+  <!-- Add payment form -->
+  <div id="main-content" style="display:none;">
+    <div class="section-head">
+      <span class="section-label">Nuevo pago</span>
+    </div>
+    <div class="form-wrap">
+      <div class="form-grid">
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" id="inp-date">
+        </div>
+        <div class="field">
+          <label>Monto</label>
+          <input type="number" id="inp-amount" placeholder="0.00" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label>Moneda</label>
+          <select id="inp-currency">
+            <option value="€">€ EUR</option>
+            <option value="$">$ USD</option>
+            <option value="USDT">USDT</option>
+            <option value="Bs">Bs VES</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Concepto</label>
+          <input type="text" id="inp-concept" placeholder="Pago parcial, transferencia...">
+        </div>
+        <div class="field full">
+          <label>Comprobante — enlace</label>
+          <input type="url" id="inp-link" placeholder="https://drive.google.com/...">
+        </div>
+      </div>
+
+      <div class="divider"><span>o adjunta imagen</span></div>
+
+      <div class="field" style="margin-bottom:16px;">
+        <label>Comprobante — imagen</label>
+        <div class="file-zone">
+          <div class="file-fake" id="file-label">Toca para seleccionar imagen</div>
+          <input type="file" id="inp-file" accept="image/*" onchange="handleFile(this)">
+        </div>
+      </div>
+
+      <button class="btn-primary" id="add-btn" onclick="addPayment()">Registrar pago</button>
+    </div>
+
+    <!-- Payment history -->
+    <div class="section-head">
+      <span class="section-label">Historial</span>
+      <span id="payment-count" style="font-family:var(--mono);font-size:11px;color:var(--ink4);"></span>
+    </div>
+    <div id="list-wrap">
+      <div class="empty-state fade-up">
+        <p class="empty-line1">Sin pagos aún</p>
+        <p class="empty-line2">Añade el primero arriba</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Image modal -->
+<div class="modal-overlay" id="img-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('img-modal')">✕</button>
+    <p class="modal-eyebrow">Comprobante de pago</p>
+    <img id="modal-img" src="" alt="Comprobante">
+  </div>
+</div>
+
+<!-- Config modal -->
+<div class="modal-overlay" id="cfg-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('cfg-modal')">✕</button>
+    <p class="modal-eyebrow">Configuración</p>
+    <p class="modal-title">Detalles de la deuda</p>
+    <div class="modal-form">
+      <div class="modal-grid">
+        <div class="field">
+          <label>Tu nombre</label>
+          <input type="text" id="cfg-debtor" placeholder="Leo">
+        </div>
+        <div class="field">
+          <label>Nombre del acreedor</label>
+          <input type="text" id="cfg-creditor" placeholder="Carlos">
+        </div>
+        <div class="field">
+          <label>Monto total de la deuda</label>
+          <input type="number" id="cfg-total" placeholder="0.00" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label>Moneda base</label>
+          <select id="cfg-currency">
+            <option value="€">€ EUR</option>
+            <option value="$">$ USD</option>
+            <option value="USDT">USDT</option>
+            <option value="Bs">Bs VES</option>
+          </select>
+        </div>
+      </div>
+      <div class="divider"><span>url del script</span></div>
+      <div class="field">
+        <label>Google Apps Script URL</label>
+        <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/...">
+      </div>
+      <button class="btn-primary" onclick="saveConfig()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────
+let SCRIPT_URL = localStorage.getItem('pago_script_url') || '';
+let config = { creditor: '', debtor: '', total: 0, currency: '€' };
+let payments = [];
+let pendingImage = null;
+let loading = false;
+
+// ─── Init ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-date').value = today;
+
+  if (SCRIPT_URL) {
+    document.getElementById('setup-card').style.display = 'none';
+    await init();
+  } else {
+    setStatus('sin conexión', 'err');
+    document.getElementById('api-banner').style.display = 'block';
+  }
+});
+
+async function init() {
+  setStatus('conectando', 'loading');
+  try {
+    await loadConfig();
+    await loadPayments();
+    setStatus('conectado', 'ok');
+    document.getElementById('hero').style.display = 'block';
+    document.getElementById('stats-block').style.display = 'grid';
+    document.getElementById('main-content').style.display = 'block';
+    updateHero();
+    renderStats();
+    renderPayments();
+  } catch(e) {
+    setStatus('error', 'err');
+    toast('No se pudo conectar con el script');
+  }
+}
+
+// ─── API calls ────────────────────────────────────────
+function api(params) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+
+    // First fetch to follow the redirect, then inject as script
+    const url = new URL(SCRIPT_URL);
+    Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, String(v)));
+    url.searchParams.set('callback', cbName);
+
+    window[cbName] = (data) => {
+      delete window[cbName];
+      if (data && data.error) reject(new Error(data.error));
+      else resolve(data);
+    };
+
+    fetch(url.toString(), { redirect: 'follow' })
+      .then(r => r.text())
+      .then(text => {
+        try { eval(text); }
+        catch(e) { delete window[cbName]; reject(e); }
+      })
+      .catch(err => {
+        delete window[cbName];
+        reject(err);
+      });
+  });
+}
+
+async function loadConfig() {
+  const data = await api({ action: 'getConfig' });
+  if (data.config) {
+    config.creditor = data.config.creditor || '';
+    config.debtor   = data.config.debtor   || '';
+    config.total    = parseFloat(data.config.total) || 0;
+    config.currency = data.config.currency || '€';
+  }
+}
+
+async function loadPayments() {
+  const data = await api({ action: 'getAll' });
+  payments = data.payments || [];
+}
+
+// ─── UI helpers ───────────────────────────────────────
+function fmt(amount, sym) {
+  sym = sym || config.currency;
+  const n = parseFloat(amount) || 0;
+  return sym + n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function setStatus(text, type) {
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot ' + (type || '');
+  document.getElementById('status-text').textContent = text;
+}
+
+function toast(msg, duration) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration || 2800);
+}
+
+function openConfig() {
+  document.getElementById('cfg-debtor').value   = config.debtor   || '';
+  document.getElementById('cfg-creditor').value = config.creditor || '';
+  document.getElementById('cfg-total').value    = config.total    || '';
+  document.getElementById('cfg-currency').value = config.currency || '€';
+  document.getElementById('cfg-url').value      = SCRIPT_URL;
+  document.getElementById('cfg-modal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+function updateHero() {
+  const creditor = config.creditor || '—';
+  const debtor   = config.debtor   ? config.debtor + ' →' : '';
+  document.getElementById('hero-title').textContent = debtor + ' ' + creditor;
+  document.getElementById('hero-sub').textContent = config.total
+    ? 'Deuda total: ' + fmt(config.total, config.currency)
+    : 'Configura el monto total de la deuda';
+}
+
+function renderStats() {
+  const sym  = config.currency;
+  const total = parseFloat(config.total) || 0;
+  let paid = 0;
+  payments.forEach(p => { if (p.currency === sym) paid += parseFloat(p.amount) || 0; });
+  const pending = Math.max(0, total - paid);
+
+  document.getElementById('stat-total').textContent   = total  ? fmt(total, sym)   : '—';
+  document.getElementById('stat-paid').textContent    = fmt(paid, sym);
+  document.getElementById('stat-pending').textContent = total  ? fmt(pending, sym) : '—';
+
+  if (total > 0) {
+    const pct = Math.min(100, (paid / total) * 100);
+    document.getElementById('progress-wrap').style.display = 'block';
+    document.getElementById('gap-after-stats').style.display = 'none';
+    document.getElementById('progress-fill').style.width = pct.toFixed(1) + '%';
+    document.getElementById('progress-pct').textContent = pct.toFixed(0) + '%';
+  } else {
+    document.getElementById('progress-wrap').style.display = 'none';
+  }
+}
+
+function renderPayments() {
+  const wrap = document.getElementById('list-wrap');
+  document.getElementById('payment-count').textContent = payments.length ? payments.length + ' registros' : '';
+
+  if (!payments.length) {
+    wrap.innerHTML = `<div class="empty-state fade-up">
+      <p class="empty-line1">Sin pagos aún</p>
+      <p class="empty-line2">Añade el primero arriba</p>
+    </div>`;
+    return;
+  }
+
+  const rows = payments.map((p, i) => {
+    const concept = p.concept || 'Pago registrado';
+    const proofHTML = p.link
+      ? `<a class="proof-btn" href="${p.link}" target="_blank">↗ Ver</a>`
+      : p.imageData
+      ? `<span class="proof-btn" onclick="showImg('${p.id}')">↗ Ver</span>`
+      : '';
+    return `<div class="payment-item fade-up" style="animation-delay:${i * 0.04}s">
+      <div class="pay-index">${String(payments.length - i).padStart(2,'0')}</div>
+      <div class="pay-body">
+        <div class="pay-date">${fmtDate(p.date)}</div>
+        <div class="pay-concept">${concept}</div>
+      </div>
+      <div class="pay-right">
+        <div class="pay-amount">${fmt(p.amount, p.currency)}</div>
+        <div class="pay-actions">
+          ${proofHTML}
+          <button class="del-btn" onclick="deletePayment('${p.id}')" title="Eliminar">×</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = `<div class="payment-list-wrap"><div class="payment-list">${rows}</div></div>`;
+}
+
+// ─── Actions ──────────────────────────────────────────
+async function addPayment() {
+  const date    = document.getElementById('inp-date').value;
+  const amount  = parseFloat(document.getElementById('inp-amount').value);
+  const currency = document.getElementById('inp-currency').value;
+  const concept = document.getElementById('inp-concept').value.trim();
+  const link    = document.getElementById('inp-link').value.trim();
+
+  if (!date || !amount || amount <= 0) { toast('Ingresa fecha y monto'); return; }
+  if (!SCRIPT_URL) { toast('Conecta el script primero'); return; }
+
+  const payment = {
+    id: Date.now().toString(),
+    date, amount, currency,
+    concept: concept || '',
+    link: link || '',
+    imageData: pendingImage || ''
+  };
+
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  try {
+    await api({ action: 'addPayment', payment: JSON.stringify(payment) });
+    payments.unshift(payment);
+    renderStats();
+    renderPayments();
+    toast('Pago registrado');
+    document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('inp-amount').value = '';
+    document.getElementById('inp-concept').value = '';
+    document.getElementById('inp-link').value = '';
+    document.getElementById('inp-file').value = '';
+    document.getElementById('file-label').textContent = 'Toca para seleccionar imagen';
+    pendingImage = null;
+  } catch(e) {
+    toast('Error al guardar');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Registrar pago';
+}
+
+async function deletePayment(id) {
+  if (!confirm('¿Eliminar este pago?')) return;
+  try {
+    await api({ action: 'deletePayment', id });
+    payments = payments.filter(p => p.id !== id);
+    renderStats();
+    renderPayments();
+    toast('Eliminado');
+  } catch(e) { toast('Error al eliminar'); }
+}
+
+async function saveConfig() {
+  const newConfig = {
+    debtor:   document.getElementById('cfg-debtor').value.trim(),
+    creditor: document.getElementById('cfg-creditor').value.trim(),
+    total:    parseFloat(document.getElementById('cfg-total').value) || 0,
+    currency: document.getElementById('cfg-currency').value
+  };
+  const newUrl = document.getElementById('cfg-url').value.trim();
+
+  if (newUrl && newUrl !== SCRIPT_URL) {
+    SCRIPT_URL = newUrl;
+    localStorage.setItem('pago_script_url', SCRIPT_URL);
+  }
+
+  try {
+    await api({ action: 'saveConfig', config: JSON.stringify(newConfig) });
+    Object.assign(config, newConfig);
+    updateHero();
+    renderStats();
+    closeModal('cfg-modal');
+    toast('Configuración guardada');
+    if (document.getElementById('main-content').style.display === 'none') {
+      document.getElementById('setup-card').style.display = 'none';
+      await init();
+    }
+  } catch(e) { toast('Error al guardar configuración'); }
+}
+
+async function connectScript() {
+  const url = document.getElementById('setup-url').value.trim();
+  if (!url) { toast('Pega la URL del script'); return; }
+  SCRIPT_URL = url;
+  localStorage.setItem('pago_script_url', url);
+  document.getElementById('setup-card').style.display = 'none';
+  document.getElementById('api-banner').style.display = 'none';
+  await init();
+}
+
+// ─── File handling ────────────────────────────────────
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('file-label').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => { pendingImage = e.target.result; };
+  reader.readAsDataURL(file);
+}
+
+// ─── Image modal ──────────────────────────────────────
+function showImg(id) {
+  const p = payments.find(x => x.id === id);
+  if (!p || !p.imageData) return;
+  document.getElementById('modal-img').src = p.imageData;
+  document.getElementById('img-modal').classList.add('open');
+}
+</script>
+</body>
+</html>
